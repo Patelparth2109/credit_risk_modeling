@@ -34,6 +34,26 @@ All metrics are **out-of-time test performance** on the 2016–2018 vintages.
 | [`02_data_cleaning`](notebooks/02_data_cleaning.ipynb) | Type coercion, documented row drops (2.37%), ordinal encodings, missing-indicator flags plus median fills, and the target (1 = Charged Off/Default, 0 = Fully Paid; unresolved loans excluded). | `workspace.default.lending_club_cleaned`: 1,296,898 loans, ~20% default rate, zero nulls |
 | [`03_feature_engineering_modeling`](notebooks/03_feature_engineering_modeling.ipynb) | Fixed business-rule encodings, temporal split, LR baseline vs LightGBM challenger, feature-ablation experiments, temporally validated hyperparameter search, final model. All runs are logged to MLflow. | Model runs in MLflow |
 
+## Reusable modules (`src/`)
+
+The notebook logic is factored into importable, pure-pandas modules. They don't mutate their inputs, so each step can be tested and reused outside the notebooks.
+
+| Module | Contents |
+| --- | --- |
+| [`config.py`](src/config.py) | Single source of truth for table names, the temporal cutoff, feature lists, LR/LightGBM hyperparameters (fixed and tuned) and economic assumptions |
+| [`cleaning.py`](src/cleaning.py) | Numeric coercion, unsalvageable-row mask, `emp_length` ordinal encoding, history and bureau missing flags with median fills, target construction |
+| [`features.py`](src/features.py) | Business-rule ordinal encodings, credit-history length, rare-category collapsing, out-of-time split, train-only one-hot model matrices |
+| [`evaluation.py`](src/evaluation.py) | Ranking metrics (ROC-AUC, Gini, PR-AUC, KS, Brier, log-loss) and decile/lift table |
+| [`economics.py`](src/economics.py) | Loan unit economics (amortized EAD, LGD, cost of funds) and the expected-value approval rule: approve iff expected profit > 0 |
+
+```python
+from src.features import temporal_split, build_model_matrices
+from src.evaluation import rank_metrics
+
+train_df, test_df = temporal_split(df)
+X_train, X_test, y_train, y_test = build_model_matrices(train_df, test_df)
+```
+
 ## Methodology highlights
 
 - **No outcome leakage.** Post-origination columns (`total_pymnt`, `recoveries`, `last_fico_*`, …) are dropped at the start, and all encodings are fixed mappings rather than learned from the data.
@@ -52,7 +72,7 @@ The notebooks were developed on **Databricks serverless compute** and use Unity 
 
 1. Import the notebooks into a Databricks workspace (or attach this repo as a Git folder).
 2. Upload the raw CSV and set its path in `01_data_profiling`.
-3. Set the MLflow experiment path in `03_feature_engineering_modeling` (currently `/Users/<your_username>/credit_risk_lending_club`).
+3. Set the MLflow experiment path in `03_feature_engineering_modeling` and `src/config.py` (currently `/Users/<your_username>/credit_risk_lending_club`).
 4. Run notebooks 01 → 02 → 03 in order.
 
 Outside Databricks, install `requirements.txt` and replace the `spark.read.table(...)` hand-offs with local files.
