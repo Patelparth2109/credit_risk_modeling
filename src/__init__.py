@@ -1,1 +1,1 @@
-"""Lending Club credit-risk pipeline: shared config, cleaning, features, evaluation, economics."""
+"""Lending Club credit-risk pipeline: shared config, cleaning, features, evaluation."""

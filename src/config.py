@@ -63,8 +63,3 @@ LGBM_TUNED_PARAMS = {
     'n_jobs': -1,
     'verbose': -1,
 }
-
-# --- loan unit economics (documented assumptions; see notebooks/04 and README) ---
-COST_OF_FUNDS = 0.06  # per year on the average outstanding balance (~5% money + ~1% servicing)
-LGD = 0.75            # loss given default, net of ALL post-default recoveries
-EL_CAP = 0.06         # risk appetite: expected-loss cap as a share of funded dollars

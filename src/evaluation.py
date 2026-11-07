@@ -3,7 +3,7 @@
 Used identically for every model and variant so comparisons are like-for-like.
 Note: models trained with class_weight='balanced' inflate raw probabilities —
 treat scores as rankings (AUC / KS / deciles) and calibrate before using them
-as probabilities (see notebooks/04_business_impact).
+as probabilities.
 """
 
 from __future__ import annotations
