@@ -1,0 +1,8 @@
+# Developed on Databricks serverless compute (PySpark, MLflow preinstalled).
+# For running outside Databricks:
+pyspark
+pandas
+numpy
+scikit-learn
+lightgbm
+mlflow
